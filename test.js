@@ -484,7 +484,98 @@ function carCollision() {
 function logCollision() {
     for ( l = 0; l < logs.length; l++ ) {
         if ( hero.position.z == logs[l].position.z ) {
-            if ( hero.position.x < logs[l].position.x + lCollide)
+            if ( hero.position.x < logs[l].position.x + lCollide && hero.position.x > cars[c].position.x - cCollide ) {
+                hero.scale.y = 0;
+                hero.position.y = .1;
+                gameOver();
+            }
         }
     }
 }
+
+function logCollision() {
+    for ( l = 0; l < logs.length; l++ ) {
+        if ( hero.position.z == logs[l].position.z ) {
+            if ( hero.position.x < logs[l].position.x + lCollide && hero.position.x > logs[l].position.x - lCollide ) {
+                onLog = true;
+                if ( hero.position.x > logs[l].position.x ) {
+                    hero.position.x = logs[l].position.x + .5;
+                } else {
+                    hero.position.x = logs[l].position.x - .5;
+                }
+                if ( hero.position.x > 5 || hero.position.x < -5 ) {
+                    gameOver();
+                }
+            }
+        }
+    }
+}
+
+function waterCollision() {
+    if ( onLog == false ) {
+        for ( w = 0; w < water.length; w++ ) {
+            if ( hero.position.z == water[w].position.z ) {
+                gameOver();
+
+                y = Math.sin( sineCount ) * .08-.2;
+                sineCount += sineInc;
+                hero.position.y = y;
+                for ( w = 0; w < logSpeed.length; w++ ) {
+                    if ( hero.position.z == logs[w].position.z ) {
+                        hero.position.x += logSpeed[w] / 3;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function forwardScene() {
+    if ( !pause ) {
+        if ( Math.floor( camera.position.z ) < hero.position.z - 4 ) {
+            camera.position.z += .033;
+            if ( camCount > 1.8 ) {
+                camCount = 0;
+                newRow();
+                newRow();
+                newRow();
+            } else {
+                camCount += camSpeed;
+            }
+        } else {
+            camera.position.z += .011;
+            if ( camCount > 1.8 ) {
+                camCount = 0;
+                newRow();
+            } else {
+                camCount += camSpeed;
+            }
+        }
+    }
+}
+
+function gameOver() {
+    pause = true;
+    endScore();
+}
+
+var sineCount = 0;
+var sineInc = Math.PI / 50;
+
+function render() {
+    requestAnimationFrame( render );
+    drive();
+    carCollision();
+    logCollision();
+    waterCollision();
+    forwardScene();
+
+    if ( score < hero.position.z ) {
+        score = hero.position.z;
+    }
+    scoreDiv.innerHTML = score;
+    renderer.render( scene, camera );
+}
+
+init();
+render();
