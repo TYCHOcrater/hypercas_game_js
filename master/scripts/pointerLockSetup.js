@@ -33,4 +33,4 @@ var pointerLock = ( function () {
         init: init,
         controls: controls
     }
-})();
+})(); 
